@@ -1,0 +1,4 @@
+This project uses the tcl language to create a new build system similar to make
+but more cleaner (can accept filename with spaces and quotes very simpely) and
+add the power of the tcl language, that has the advantage of being syntaxicly
+very close to shellscripts
