@@ -9,6 +9,3 @@
 # full path name of this file's directory.
 
 package ifneeded TBuild::Clang 0.1 [list source [file join $dir Clang.tcl]]
-
-
-puts "pkgIndex.tcl"

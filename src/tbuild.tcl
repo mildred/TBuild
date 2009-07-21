@@ -121,6 +121,8 @@ interp eval   $i source $tbuildfile
 
 #puts $TBuild::targets
 
-TBuild::execute::run $targets
-
-exit
+if [TBuild::execute::run $targets] {
+  exit 0
+} else {
+  exit 1
+}

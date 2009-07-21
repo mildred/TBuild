@@ -1,7 +1,7 @@
-#!/usr/bin/env tclsh
-#set auto_path [linsert $::auto_path 0 [pwd]]
-#package require TBuild::Clang
+#!/usr/bin/env tbuild
 
 Aliases [TBuild Aliases]
+TBuild Require Clang
+Alias Clang TBuild Clang
 
 Include src

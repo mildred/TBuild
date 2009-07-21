@@ -1,11 +1,7 @@
-#!/usr/bin/env tclsh
-#set auto_path [linsert $::auto_path 0 [pwd]]
-#package require TBuild::Clang
+#!/usr/bin/env tbuild
 
-TBuild Require Clang
-Alias Clang TBuild Clang
-
-Clang obj main.o main.c
+#Clang obj main.o main.c
+Clang exe tbuild {main.c} -ltcl8.5
 
 # depends all excutable
 # 

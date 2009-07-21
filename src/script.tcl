@@ -119,8 +119,12 @@ namespace eval TBuild {
     variable locate_source
     variable current_dir
     foreach arg $args {
-      dict set targets $arg var search [list $search_source]
-      dict set targets $arg var locate $locate_source
+      if {! [dict exists $targets $arg var search] } {
+	dict set targets $arg var search [list $search_source]
+      }
+      if {! [dict exists $targets $arg var locate] } {
+	dict set targets $arg var locate $locate_source
+      }
     }
   }
 
@@ -131,8 +135,12 @@ namespace eval TBuild {
     variable current_dir
     foreach arg $args {
       # place in $locate_target
-      dict set targets $arg var search [list $locate_target]
-      dict set targets $arg var locate $locate_target
+      if {! [dict exists $targets $arg var search] } {
+	dict set targets $arg var search [list $locate_target]
+      }
+      if {! [dict exists $targets $arg var locate] } {
+	dict set targets $arg var locate $locate_target
+      }
     }
   }
 
@@ -156,7 +164,7 @@ namespace eval TBuild {
     variable targets
     foreach arg $args {
       upvar $arg var
-      set var [list {} $var]
+      set var [list $var]
       SetFlag $var NotFile
     }
   }
@@ -202,7 +210,7 @@ namespace eval TBuild {
     variable targets
     variable variables
     if [llength $args] {
-      return [dict exists $targets $a var [lindex 0 $args]]
+      return [dict exists $targets $a var [lindex $args 0]]
     } else {
       return [dict exists $variables $a]
     }
@@ -224,14 +232,61 @@ namespace eval TBuild {
     }
   }
 
-  proc Set {a b args} {
-    # ?target? var val
+  proc Set {args} {
+    # ?-append? ?--? ?target? var val ...
     variable targets
     variable variables
-    if [llength $args] {
-      return [dict set targets $a var $b [lindex 0 $args]]
+
+    set doAppend false
+    set doGlobal true
+    set target ""
+
+    set argCount [llength $args]
+    for {set idx 0} {$idx < $argCount} {incr idx} {
+	set flag [lindex $args $idx]
+	switch -- $flag {
+	    -- {
+		incr idx
+		break
+	    }
+	    -append {
+		set doAppend true
+	    }
+	    default {
+		break
+	    }
+	}
+    }
+
+    if {$argCount - $idx < 2} {
+	return -code error "wrong # args"
+    }
+
+    set i $idx
+    if {$argCount - $idx >= 3} {
+      set target [lindex $args $idx]
+      incr idx
+      set doGlobal false
+    }
+    set var [lindex $args $idx]
+    incr idx
+
+    if $doAppend {
+      if [catch {
+	set val [Get {*}[lrange $args $i [expr $idx - 1]]]
+      }] then {
+	set val [lrange $args $idx end]
+      } else {
+	lappend val {*}[lrange $args $idx end]
+      }
     } else {
-      return [dict set variables $a $b]
+      set val [lindex $args $idx]
+    }
+
+    if $doGlobal {
+      return [dict set variables $var $val]
+    } else {
+      return [dict set targets $target var $var $val]
     }
   }
 
@@ -328,6 +383,13 @@ namespace eval TBuild {
     }
   }
 
+  proc Exec {args} {
+    set code [catch {exec {*}$args} res]
+    if {$code != 0} {
+      return -code $code "$args\n\n$res\n"
+    }
+  }
+
   proc Aliases {{prefix {TBuild}}} {
     set res ""
     set all_functions {Include MakeGlobal FindSource FindTarget MakeSource \
@@ -342,7 +404,7 @@ namespace eval TBuild {
 
   namespace export Include MakeGlobal FindSource FindTarget MakeSource \
     MakeTarget MakeNotFile Source Target NotFile Depends DependsInc Make \
-    Exists Get Set Unset Require FileSearch FileLocate Aliases
+    Exists Get Set Unset Require FileSearch FileLocate Exec Aliases
   namespace ensemble create
 
 }
@@ -352,19 +414,27 @@ namespace eval TBuild::execute {
   proc run {choosen_targets} {
     namespace upvar [namespace parent] targets targets
     #puts "Build targets: $choosen_targets"
+    set res true
     foreach tname $choosen_targets {
       set found [find_targets $tname]
       if [dict exists $targets $tname] {
 	puts "Build target $tname"
-	run_target $tname
+	if [catch {run_target $tname} msg] {
+	  puts $msg
+	  set res false
+	}
       } elseif { [llength $found] == 0 } {
 	puts "Can't find targets for $tname"
       }
       foreach t $found {
 	puts "Build target $t"
-	run_target $t
+	if [catch {run_target $t} msg] {
+	  puts $msg
+	  set res false
+	}
       }
     }
+    return $res
   }
 
   proc find_targets {name} {
@@ -419,11 +489,13 @@ namespace eval TBuild::execute {
       foreach targ $targs {
 	set f [[namespace parent]::FileSearch $targ]
 	lappend fargs $f
-	puts "[string repeat " " [string length $func]] $f"
+	#puts "[string repeat " " [string length $func]] $f"
       }
-      $func $target {*}$fargs
+      if [catch {$func $target {*}$fargs} res] {
+	puts "Error: $res"
+	return -code error "Couldn't build target $target"
+      }
     }
-    return true
   }
 
   proc dependancies {target} {
@@ -564,6 +636,8 @@ interp eval   $i source $tbuildfile
 
 #puts $TBuild::targets
 
-TBuild::execute::run $targets
-
-exit
+if [TBuild::execute::run $targets] {
+  exit 0
+} else {
+  exit 1
+}
