@@ -1,6 +1,7 @@
 #!/usr/bin/env tclsh
 # kate: hl Tcl/Tk;
 set auto_path [linsert $::auto_path 0 [file normalize [file dirname $argv0]]]
+set auto_path [linsert $::auto_path 0 [file normalize [pwd]]]
 
 package require TBuild
 
