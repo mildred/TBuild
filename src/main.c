@@ -58,6 +58,8 @@ int main(int argc, char* argv[]){
 
     /*
      * Invoke application-specific initialization.
+     *
+     * Current implementation call Tcl_Init
      */
 
     if (Tcl_AppInit(interp) != TCL_OK) {
@@ -71,6 +73,10 @@ int main(int argc, char* argv[]){
     }
     if (Tcl_InterpDeleted(interp)) goto done;
     if (Tcl_LimitExceeded(interp)) goto done;
+
+    /*
+     * Evaluates the main script
+     */
 
     res = Tcl_Eval(interp, script);
     if (res != TCL_OK) {
@@ -164,11 +170,9 @@ done:
 
 int Tcl_AppInit(Tcl_Interp *interp) {
     /* Tcl_Init reads init.tcl from the Tcl script library. */
-#if 0
     if (Tcl_Init(interp) == TCL_ERROR) {
 	return TCL_ERROR;
     }
-#endif
     return TCL_OK;
 }
 

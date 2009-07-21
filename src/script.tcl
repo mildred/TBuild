@@ -1,14 +1,4 @@
 #!/usr/bin/env tclsh
-# kate: hl Tcl/Tk;
-
-
-
-
-
-
-
-
-#!/usr/bin/env tclsh
 
 package provide TBuild 0.1
 
@@ -68,12 +58,12 @@ namespace eval TBuild {
 
 #   # Declare a sub directory
 #   proc SubDir {varname args} {
-#
+# 
 #     variable current_dir
 #     variable search_source
 #     variable locate_source
 #     variable locate_target
-#
+# 
 #     upvar $varname TOP
 #     if { ! [info exists TOP] } then {
 #       set TOP [pwd]
@@ -85,33 +75,33 @@ namespace eval TBuild {
 #     foreach dir $args {
 #       set curdir [file join $curdir $dir]
 #     }
-#
+# 
 #     #puts "TOP    = $TOP"
 #     #puts "SRCDIR = $curdir"
-#
+# 
 #     set current_dir $curdir
 #     dict set search_source $current_dir $curdir
 #     dict set locate_source $current_dir $curdir
 #     dict set locate_target $current_dir $curdir
-#
+# 
 #   }
-#
+# 
 #   # Include a sub directory
 #   proc SubInc {varname args} {
-#
+# 
 #     variable current_dir
-#
+# 
 #     upvar $varname TOP
 #     set subdir $TOP
 #     foreach dir $args {
 #       set subdir [file join $subdir $dir]
 #     }
 #     set subfile [file join $subdir "TBuildfile.tcl"]
-#
+# 
 #     set mydir $current_dir
 #     source $subfile
 #     set current_dir $mydir
-#
+# 
 #   }
 
   # Similar to the adding of grist in Jam
@@ -359,18 +349,6 @@ namespace eval TBuild {
 
 namespace eval TBuild::execute {
 
-    # targets:
-    #
-    # <target> var <varname>	variable value
-    # <target> dep		list of dependancies
-    # <target> inc		list of include dependancies
-    # <target> make		function to call to generate target followed by
-    #				the list of targets to pass as arguments
-    # <target> var search	search path (list)
-    # <target> var locate	locate path
-    # <target> flags		flags
-    #
-
   proc run {choosen_targets} {
     namespace upvar [namespace parent] targets targets
     #puts "Build targets: $choosen_targets"
@@ -463,29 +441,13 @@ namespace eval TBuild::execute {
   }
 
 }
+#!/usr/bin/env tclsh
+# kate: hl Tcl/Tk;
 
+set ::auto_path [linsert $::auto_path 0 [file normalize [file dirname $argv0]]]
+set ::auto_path [linsert $::auto_path 0 [file normalize [pwd]]]
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#package require TBuild
 
 TBuild::NotFile all
 
@@ -499,7 +461,7 @@ TBuild::NotFile all
 set tbuildfile "TBuildfile.tcl"
 set targets ""
 
-set i 0
+set i 1
 while {$i < $argc} {
   set arg [lindex $argv $i]
   switch -regexp -- $arg {

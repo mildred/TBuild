@@ -349,18 +349,6 @@ namespace eval TBuild {
 
 namespace eval TBuild::execute {
 
-    # targets:
-    #
-    # <target> var <varname>	variable value
-    # <target> dep		list of dependancies
-    # <target> inc		list of include dependancies
-    # <target> make		function to call to generate target followed by
-    #				the list of targets to pass as arguments
-    # <target> var search	search path (list)
-    # <target> var locate	locate path
-    # <target> flags		flags
-    #
-
   proc run {choosen_targets} {
     namespace upvar [namespace parent] targets targets
     #puts "Build targets: $choosen_targets"

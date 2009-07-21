@@ -8,5 +8,7 @@
 # script is sourced, the variable $dir must contain the
 # full path name of this file's directory.
 
-package ifneeded TBuild 0.1 [list source [file join $dir TBuild.tcl]]
 package ifneeded TBuild::Clang 0.1 [list source [file join $dir Clang.tcl]]
+
+
+puts "pkgIndex.tcl"

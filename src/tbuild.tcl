@@ -1,9 +1,10 @@
 #!/usr/bin/env tclsh
 # kate: hl Tcl/Tk;
-set auto_path [linsert $::auto_path 0 [file normalize [file dirname $argv0]]]
-set auto_path [linsert $::auto_path 0 [file normalize [pwd]]]
 
-package require TBuild
+set ::auto_path [linsert $::auto_path 0 [file normalize [file dirname $argv0]]]
+set ::auto_path [linsert $::auto_path 0 [file normalize [pwd]]]
+
+#package require TBuild
 
 TBuild::NotFile all
 
@@ -17,7 +18,7 @@ TBuild::NotFile all
 set tbuildfile "TBuildfile.tcl"
 set targets ""
 
-set i 0
+set i 1
 while {$i < $argc} {
   set arg [lindex $argv $i]
   switch -regexp -- $arg {
